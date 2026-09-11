@@ -1,4 +1,6 @@
 .env
+.env.*
+!.env.example
 *.py[cod]
 __pycache__/
 .venv/
@@ -6,3 +8,5 @@ staticfiles/
 db.sqlite3
 *.sqlite3
 .vercel/
+.vscode/
+.DS_Store

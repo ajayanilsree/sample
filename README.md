@@ -22,9 +22,25 @@ The local fallback database is SQLite only for development. Production uses `DAT
 
 Create a Supabase project and copy its PostgreSQL connection string into `DATABASE_URL`. For the Vercel serverless runtime, use Supabase's Shared Pooler in transaction mode (port 6543), disable psycopg prepared statements (already configured with `prepare_threshold=None`), and keep `sslmode=require`. Use a direct database connection for migrations, backups, and other single-session PostgreSQL tooling. Run `python manage.py migrate` from a controlled deployment environment; never migrate on every request. See Supabase's current [connection guidance](https://supabase.com/docs/guides/database/connecting-to-postgres).
 
-## Vercel
+## Vercel deployment
 
-Import the repository, keep the included `vercel.json`, and set `DJANGO_SECRET_KEY`, `DATABASE_URL`, `DEBUG=False`, `ALLOWED_HOSTS`, and `CSRF_TRUSTED_ORIGINS`. Run migrations once against the production database before opening the site. Static files are collected with `python manage.py collectstatic --noinput` during deployment when needed.
+Ledgerly uses Vercel's current Django/Python detection; there is no legacy `vercel.json` or `/api` wrapper. Push the repository to GitHub, choose **Add New → Project** in Vercel, import the repository, and deploy with the detected Python/Django settings.
+
+Add these variables in **Vercel → Project → Settings → Environment Variables** for Production (and Preview if you want preview deployments):
+
+```text
+DJANGO_SECRET_KEY
+DEBUG=False
+DATABASE_URL
+ALLOWED_HOSTS
+CSRF_TRUSTED_ORIGINS
+```
+
+Set `DATABASE_URL` to Supabase's **Transaction Pooler** connection on port `6543`, not the Session Pooler URL used for local migrations. Set `ALLOWED_HOSTS` to the generated hostname, such as `ledgerly-example.vercel.app`, and set `CSRF_TRUSTED_ORIGINS` to `https://ledgerly-example.vercel.app`. Do not include brackets around values or commit the password.
+
+Before the first production deploy, run migrations once from a controlled machine using Supabase's direct or Session Pooler connection on port `5432`, then create the Admin with `python manage.py createsuperuser`. Do not run migrations from a request or application startup. After Vercel generates the final hostname, update the two host variables if needed and redeploy.
+
+Verify `/login/`, `/manifest.webmanifest`, and `/service-worker.js`. Then test Admin login, employee creation, employee login, transaction creation, reports, audit log, and PWA installation. Vercel CLI users can link with `vercel link`, deploy a preview with `vercel`, and deploy production with `vercel --prod`.
 
 ## PWA and mobile
 
