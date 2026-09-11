@@ -1,0 +1,1 @@
+{% extends 'base.html' %}{% block content %}<div class="narrow"><div class="form-card"><h1>Move transaction to history?</h1><p>This keeps the record available for audit but removes it from normal totals.</p><form method="post">{% csrf_token %}<button class="danger">Confirm</button> <a href="{% url 'transactions' %}">Cancel</a></form></div></div>{% endblock %}
